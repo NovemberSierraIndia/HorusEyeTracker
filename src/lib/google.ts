@@ -16,13 +16,16 @@ export async function googleFetch(url: string, accessToken: string) {
 export async function fetchEventsFromAllCalendars(
   accessToken: string,
   timeMin: string,
-  timeMax: string
+  timeMax: string,
+  timeZone?: string
 ) {
+  const tzParam = timeZone ? `&timeZone=${encodeURIComponent(timeZone)}` : "";
+
   const allEvents = await Promise.all(
     CALENDAR_IDS.map(async (calId) => {
       try {
         const data = await googleFetch(
-          `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events?timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&orderBy=startTime&maxResults=250`,
+          `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events?timeMin=${encodeURIComponent(timeMin)}&timeMax=${encodeURIComponent(timeMax)}&singleEvents=true&orderBy=startTime&maxResults=250${tzParam}`,
           accessToken
         );
         return (data.items || []).map((item: any) => ({
