@@ -19,7 +19,11 @@
       "Bash(npx shadcn@latest add tabs slider dialog input textarea badge sheet tooltip label separator -y)",
       "Bash(npm run:*)",
       "Bash(git config:*)",
-      "Bash(gh auth:*)"
+      "Bash(gh auth:*)",
+      "Bash(gh repo:*)",
+      "WebFetch(domain:horus-eye-tracker.vercel.app)",
+      "Bash(gh api:*)",
+      "Bash(ls -la \"C:\\\\Users\\\\nsalo\\\\OneDrive\\\\Desktop\\\\Code\\\\HorusEyeTracker\\\\src\\\\app\\\\\\(app\\)\\\\dashboard\\\\page.tsx\" \"C:\\\\Users\\\\nsalo\\\\OneDrive\\\\Desktop\\\\Code\\\\HorusEyeTracker\\\\src\\\\app\\\\\\(app\\)\\\\calendar\\\\page.tsx\" \"C:\\\\Users\\\\nsalo\\\\OneDrive\\\\Desktop\\\\Code\\\\HorusEyeTracker\\\\src\\\\app\\\\\\(app\\)\\\\projects\\\\page.tsx\" \"C:\\\\Users\\\\nsalo\\\\OneDrive\\\\Desktop\\\\Code\\\\HorusEyeTracker\\\\src\\\\app\\\\\\(app\\)\\\\career\\\\page.tsx\" \"C:\\\\Users\\\\nsalo\\\\OneDrive\\\\Desktop\\\\Code\\\\HorusEyeTracker\\\\src\\\\app\\\\\\(app\\)\\\\review\\\\page.tsx\")"
     ]
   }
 }
