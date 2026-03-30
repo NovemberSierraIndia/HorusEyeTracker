@@ -8,7 +8,7 @@ import {
   saveCertificates,
   toggleCertDone,
 } from "@/lib/career-storage";
-import { Loader2, ExternalLink, Check } from "lucide-react";
+import { Loader2, ExternalLink, Check, RefreshCw } from "lucide-react";
 
 export function CertificatesTab() {
   const [certs, setCerts] = useState<Certificate[]>([]);
@@ -39,22 +39,36 @@ export function CertificatesTab() {
     setCerts(toggleCertDone(index));
   };
 
+  const completedCount = certs.filter((c) => c.done).length;
+
   return (
-    <div className="space-y-6">
-      <Button
-        onClick={generate}
-        disabled={loading}
-        className="bg-racing-red hover:bg-racing-red/90 text-white"
-      >
-        {loading ? (
-          <>
-            <Loader2 size={16} className="mr-2 animate-spin" />
-            Generating...
-          </>
-        ) : (
-          "Generate Recommendations"
+    <div className="space-y-4">
+      <div className="flex items-center gap-3">
+        <Button
+          onClick={generate}
+          disabled={loading}
+          className="bg-racing-red hover:bg-racing-red/90 text-white"
+        >
+          {loading ? (
+            <>
+              <Loader2 size={16} className="mr-2 animate-spin" />
+              Generating...
+            </>
+          ) : certs.length > 0 ? (
+            <>
+              <RefreshCw size={16} className="mr-2" />
+              Re-generate
+            </>
+          ) : (
+            "Generate Recommendations"
+          )}
+        </Button>
+        {certs.length > 0 && (
+          <span className="text-xs text-text-muted">
+            {completedCount}/{certs.length} completed
+          </span>
         )}
-      </Button>
+      </div>
 
       {certs.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

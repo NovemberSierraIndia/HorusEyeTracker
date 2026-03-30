@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Copy, Loader2 } from "lucide-react";
+import { Copy, Loader2, RefreshCw } from "lucide-react";
 
 interface OutreachResult {
   subject: string;
@@ -42,7 +42,7 @@ export function OutreachTab() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label>Who are you reaching out to?</Label>
@@ -73,6 +73,11 @@ export function OutreachTab() {
           <>
             <Loader2 size={16} className="mr-2 animate-spin" />
             Generating...
+          </>
+        ) : result ? (
+          <>
+            <RefreshCw size={16} className="mr-2" />
+            Re-generate
           </>
         ) : (
           "Generate Outreach"

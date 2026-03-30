@@ -1,6 +1,3 @@
-"use client";
-
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LinkedInTab } from "@/components/career/linkedin-tab";
 import { CertificatesTab } from "@/components/career/certificates-tab";
 import { OutreachTab } from "@/components/career/outreach-tab";
@@ -11,37 +8,29 @@ export default function CareerPage() {
       <h1 className="text-2xl font-medium text-text-primary mb-6">
         Career Engine
       </h1>
-      <Tabs defaultValue="linkedin">
-        <TabsList className="bg-cream border border-border">
-          <TabsTrigger
-            value="linkedin"
-            className="data-[state=active]:bg-brg-light data-[state=active]:text-brg"
-          >
+      <div className="space-y-8">
+        <section>
+          <h2 className="text-lg font-medium text-text-primary mb-4 flex items-center gap-2">
+            <span className="w-1.5 h-5 bg-brg rounded-full inline-block" />
             LinkedIn Posts
-          </TabsTrigger>
-          <TabsTrigger
-            value="certificates"
-            className="data-[state=active]:bg-brg-light data-[state=active]:text-brg"
-          >
-            Certificate Recommendations
-          </TabsTrigger>
-          <TabsTrigger
-            value="outreach"
-            className="data-[state=active]:bg-brg-light data-[state=active]:text-brg"
-          >
-            Outreach Prep
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="linkedin" className="mt-6">
+          </h2>
           <LinkedInTab />
-        </TabsContent>
-        <TabsContent value="certificates" className="mt-6">
+        </section>
+        <section>
+          <h2 className="text-lg font-medium text-text-primary mb-4 flex items-center gap-2">
+            <span className="w-1.5 h-5 bg-racing-red rounded-full inline-block" />
+            Certificate Recommendations
+          </h2>
           <CertificatesTab />
-        </TabsContent>
-        <TabsContent value="outreach" className="mt-6">
+        </section>
+        <section>
+          <h2 className="text-lg font-medium text-text-primary mb-4 flex items-center gap-2">
+            <span className="w-1.5 h-5 bg-[#1B3A5C] rounded-full inline-block" />
+            Outreach Prep
+          </h2>
           <OutreachTab />
-        </TabsContent>
-      </Tabs>
+        </section>
+      </div>
     </div>
   );
 }

@@ -12,12 +12,26 @@ export interface Project {
   id: string;
   name: string;
   color: string;
+  category: string;
   tasks: Task[];
 }
 
 export interface ProjectsData {
   projects: Project[];
 }
+
+export const PRESET_COLORS = [
+  { name: "BRG", value: "#1B4332" },
+  { name: "Racing Red", value: "#C0392B" },
+  { name: "Forest", value: "#2D6A4F" },
+  { name: "Navy", value: "#1B3A5C" },
+  { name: "Purple", value: "#6C3483" },
+  { name: "Orange", value: "#D35400" },
+  { name: "Gold", value: "#B7950B" },
+  { name: "Slate", value: "#566573" },
+];
+
+export const CATEGORIES = ["Academic", "Career", "Personal", "Side Project"];
 
 const STORAGE_KEY = "horuseye-projects";
 
@@ -26,6 +40,7 @@ const defaultProjects: Project[] = [
     id: uuidv4(),
     name: "Master's Thesis",
     color: "#1B4332",
+    category: "Academic",
     tasks: [
       {
         id: uuidv4(),
@@ -40,6 +55,7 @@ const defaultProjects: Project[] = [
     id: uuidv4(),
     name: "Horse Powertrain Application",
     color: "#C0392B",
+    category: "Career",
     tasks: [
       {
         id: uuidv4(),
@@ -54,6 +70,7 @@ const defaultProjects: Project[] = [
     id: uuidv4(),
     name: "LUISS Coursework",
     color: "#2D6A4F",
+    category: "Academic",
     tasks: [
       {
         id: uuidv4(),
@@ -73,16 +90,26 @@ export function getProjects(): Project[] {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultProjects));
     return defaultProjects;
   }
-  return JSON.parse(stored);
+  // Migrate old projects without category
+  const projects: Project[] = JSON.parse(stored);
+  let needsSave = false;
+  for (const p of projects) {
+    if (!p.category) {
+      p.category = "Personal";
+      needsSave = true;
+    }
+  }
+  if (needsSave) saveProjects(projects);
+  return projects;
 }
 
 export function saveProjects(projects: Project[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
 }
 
-export function addProject(name: string, color: string): Project[] {
+export function addProject(name: string, color: string, category: string): Project[] {
   const projects = getProjects();
-  projects.push({ id: uuidv4(), name, color, tasks: [] });
+  projects.push({ id: uuidv4(), name, color, category, tasks: [] });
   saveProjects(projects);
   return projects;
 }
@@ -131,4 +158,12 @@ export function deleteTask(projectId: string, taskId: string): Project[] {
     saveProjects(projects);
   }
   return projects;
+}
+
+export function getEarliestDeadline(project: Project): string | null {
+  const activeTasks = project.tasks.filter((t) => !t.completed);
+  if (activeTasks.length === 0) return null;
+  return activeTasks.reduce((earliest, t) =>
+    t.endDate < earliest ? t.endDate : earliest
+  , activeTasks[0].endDate);
 }

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { WeeklyReview, saveReview } from "@/lib/review-storage";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { Loader2, RefreshCw } from "lucide-react";
 
 interface ReviewSummaryProps {
   review: WeeklyReview;
@@ -89,30 +89,53 @@ export function ReviewSummary({ review: initialReview }: ReviewSummaryProps) {
         </div>
       </div>
 
-      {review.reflection ? (
-        <div className="bg-brg-light border border-brg/20 rounded-card p-5">
-          <h4 className="text-sm font-medium text-brg mb-2">AI Reflection</h4>
-          <p className="text-sm text-text-primary leading-relaxed">
-            {review.reflection}
-          </p>
-        </div>
-      ) : (
-        <Button
-          onClick={generateReflection}
-          disabled={loading}
-          variant="outline"
-          className="border-brg text-brg hover:bg-brg-light"
-        >
-          {loading ? (
-            <>
-              <Loader2 size={16} className="mr-2 animate-spin" />
-              Generating...
-            </>
-          ) : (
-            "Generate Reflection"
-          )}
-        </Button>
-      )}
+      <div className="flex gap-3">
+        {review.reflection ? (
+          <div className="flex-1 space-y-3">
+            <div className="bg-brg-light border border-brg/20 rounded-card p-5">
+              <h4 className="text-sm font-medium text-brg mb-2">AI Reflection</h4>
+              <p className="text-sm text-text-primary leading-relaxed">
+                {review.reflection}
+              </p>
+            </div>
+            <Button
+              onClick={generateReflection}
+              disabled={loading}
+              variant="outline"
+              size="sm"
+              className="border-brg text-brg hover:bg-brg-light"
+            >
+              {loading ? (
+                <>
+                  <Loader2 size={14} className="mr-2 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <RefreshCw size={14} className="mr-2" />
+                  Re-generate Reflection
+                </>
+              )}
+            </Button>
+          </div>
+        ) : (
+          <Button
+            onClick={generateReflection}
+            disabled={loading}
+            variant="outline"
+            className="border-brg text-brg hover:bg-brg-light"
+          >
+            {loading ? (
+              <>
+                <Loader2 size={16} className="mr-2 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              "Generate Reflection"
+            )}
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

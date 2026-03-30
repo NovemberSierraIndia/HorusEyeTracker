@@ -15,8 +15,10 @@ export async function GET() {
 
     return NextResponse.json({
       temp: Math.round(data.main.temp),
+      feelsLike: Math.round(data.main.feels_like),
       condition: data.weather[0].description,
       windSpeed: data.wind.speed,
+      humidity: data.main.humidity,
       icon: `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`,
     });
   } catch (error) {

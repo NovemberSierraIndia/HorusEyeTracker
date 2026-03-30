@@ -1,11 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 interface WeatherData {
   temp: number;
+  feelsLike: number;
   condition: string;
   windSpeed: number;
+  humidity: number;
   icon: string;
 }
 
@@ -35,22 +38,37 @@ export function WeatherCard() {
       {loading ? (
         <div className="h-24 bg-cream rounded-lg animate-pulse" />
       ) : weather ? (
-        <div className="flex items-center gap-4">
-          <img
-            src={weather.icon}
-            alt={weather.condition}
-            className="w-16 h-16"
-          />
-          <div>
-            <p className="font-mono text-3xl font-medium text-text-primary">
-              {weather.temp}°C
-            </p>
-            <p className="text-sm text-text-secondary capitalize">
-              {weather.condition}
-            </p>
-            <p className="text-xs text-text-muted mt-1">
-              Wind: {weather.windSpeed} m/s
-            </p>
+        <div>
+          <div className="flex items-center gap-4 mb-4">
+            <Image
+              src={weather.icon}
+              alt={weather.condition}
+              width={64}
+              height={64}
+              unoptimized
+            />
+            <div>
+              <p className="font-mono text-3xl font-medium text-text-primary">
+                {weather.temp}°C
+              </p>
+              <p className="text-sm text-text-secondary capitalize">
+                {weather.condition}
+              </p>
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-3 pt-3 border-t border-border">
+            <div>
+              <p className="text-xs text-text-muted">Feels like</p>
+              <p className="font-mono text-sm text-text-primary">{weather.feelsLike}°C</p>
+            </div>
+            <div>
+              <p className="text-xs text-text-muted">Wind</p>
+              <p className="font-mono text-sm text-text-primary">{weather.windSpeed} m/s</p>
+            </div>
+            <div>
+              <p className="text-xs text-text-muted">Humidity</p>
+              <p className="font-mono text-sm text-text-primary">{weather.humidity}%</p>
+            </div>
           </div>
         </div>
       ) : (

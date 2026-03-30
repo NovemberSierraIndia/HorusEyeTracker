@@ -3,12 +3,15 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { getLinkedInPosts, saveLinkedInPosts } from "@/lib/career-storage";
-import { Copy, Loader2 } from "lucide-react";
+import { Copy, Loader2, RefreshCw } from "lucide-react";
 
 export function LinkedInTab() {
   const [posts, setPosts] = useState<string[]>([]);
   const [topic, setTopic] = useState("");
+  const [tone, setTone] = useState("professional");
+  const [audience, setAudience] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState<number | null>(null);
 
@@ -22,7 +25,11 @@ export function LinkedInTab() {
       const res = await fetch("/api/ai/linkedin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic: topic || undefined }),
+        body: JSON.stringify({
+          topic: topic || undefined,
+          tone,
+          audience: audience || undefined,
+        }),
       });
       const data = await res.json();
       if (data.posts) {
@@ -40,31 +47,64 @@ export function LinkedInTab() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="bg-cream-light border border-border rounded-card p-4">
         <p className="text-sm text-text-secondary">
-          <span className="font-medium text-text-primary">Context:</span>{" "}
+          <span className="font-medium text-text-primary">Your profile:</span>{" "}
           Automotive digital transformation | Master&apos;s student at LUISS |
-          Targeting senior roles in performance automotive
+          Targeting senior roles in performance automotive &amp; motorsport
         </p>
       </div>
 
-      <div className="flex gap-3">
-        <Input
-          value={topic}
-          onChange={(e) => setTopic(e.target.value)}
-          placeholder="Optional: specific topic or angle..."
-          className="bg-cream-light border-border"
-        />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div>
+          <Label className="text-xs">Topic / Angle</Label>
+          <Input
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+            placeholder="e.g. EV transition in motorsport"
+            className="mt-1 bg-cream-light border-border"
+          />
+        </div>
+        <div>
+          <Label className="text-xs">Tone</Label>
+          <select
+            value={tone}
+            onChange={(e) => setTone(e.target.value)}
+            className="mt-1 block w-full bg-cream-light border border-border rounded-lg px-3 py-2 text-sm"
+          >
+            <option value="professional">Professional</option>
+            <option value="thought-leadership">Thought Leadership</option>
+            <option value="storytelling">Storytelling</option>
+            <option value="bold">Bold / Provocative</option>
+          </select>
+        </div>
+        <div>
+          <Label className="text-xs">Target Audience</Label>
+          <Input
+            value={audience}
+            onChange={(e) => setAudience(e.target.value)}
+            placeholder="e.g. F1 engineers, recruiters"
+            className="mt-1 bg-cream-light border-border"
+          />
+        </div>
+      </div>
+
+      <div className="flex gap-2">
         <Button
           onClick={generate}
           disabled={loading}
-          className="bg-racing-red hover:bg-racing-red/90 text-white whitespace-nowrap"
+          className="bg-racing-red hover:bg-racing-red/90 text-white"
         >
           {loading ? (
             <>
               <Loader2 size={16} className="mr-2 animate-spin" />
               Generating...
+            </>
+          ) : posts.length > 0 ? (
+            <>
+              <RefreshCw size={16} className="mr-2" />
+              Re-generate Posts
             </>
           ) : (
             "Generate Posts"
