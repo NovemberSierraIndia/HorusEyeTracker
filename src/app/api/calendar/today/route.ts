@@ -20,10 +20,9 @@ export async function GET() {
     day: "2-digit",
   }).format(new Date()); // e.g. "2026-03-31"
 
-  // Pass date-only bounds + timezone so Google Calendar API
-  // interprets "today" correctly in Rome's timezone
-  const timeMin = `${romeToday}T00:00:00`;
-  const timeMax = `${romeToday}T23:59:59`;
+  // RFC 3339 timestamps with Z suffix for Google Calendar API
+  const timeMin = `${romeToday}T00:00:00Z`;
+  const timeMax = `${romeToday}T23:59:59Z`;
 
   try {
     const events = await fetchEventsFromAllCalendars(

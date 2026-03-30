@@ -8,7 +8,8 @@ export async function googleFetch(url: string, accessToken: string) {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
   if (!res.ok) {
-    throw new Error(`Google API error: ${res.status} ${res.statusText}`);
+    const body = await res.text().catch(() => "");
+    throw new Error(`Google API error: ${res.status} ${res.statusText} — ${body}`);
   }
   return res.json();
 }
@@ -34,7 +35,8 @@ export async function fetchEventsFromAllCalendars(
           start: item.start?.dateTime || item.start?.date,
           end: item.end?.dateTime || item.end?.date,
         }));
-      } catch {
+      } catch (err) {
+        console.error(`[HorusEye] Failed to fetch calendar ${calId}:`, err);
         return [];
       }
     })
