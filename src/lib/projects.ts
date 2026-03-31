@@ -13,6 +13,8 @@ export interface Project {
   name: string;
   color: string;
   category: string;
+  startDate: string;
+  endDate: string;
   tasks: Task[];
 }
 
@@ -41,6 +43,8 @@ const defaultProjects: Project[] = [
     name: "Master's Thesis",
     color: "#1B4332",
     category: "Academic",
+    startDate: "2026-01-15",
+    endDate: "2026-07-15",
     tasks: [
       {
         id: uuidv4(),
@@ -56,6 +60,8 @@ const defaultProjects: Project[] = [
     name: "Horse Powertrain Application",
     color: "#C0392B",
     category: "Career",
+    startDate: "2026-05-01",
+    endDate: "2026-07-01",
     tasks: [
       {
         id: uuidv4(),
@@ -71,6 +77,8 @@ const defaultProjects: Project[] = [
     name: "LUISS Coursework",
     color: "#2D6A4F",
     category: "Academic",
+    startDate: "2026-01-10",
+    endDate: "2026-07-15",
     tasks: [
       {
         id: uuidv4(),
@@ -90,12 +98,20 @@ export function getProjects(): Project[] {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultProjects));
     return defaultProjects;
   }
-  // Migrate old projects without category
   const projects: Project[] = JSON.parse(stored);
   let needsSave = false;
   for (const p of projects) {
-    if (!p.category) {
-      p.category = "Personal";
+    if (!p.category) { p.category = "Personal"; needsSave = true; }
+    // Migrate: derive project dates from tasks if missing
+    if (!p.startDate || !p.endDate) {
+      if (p.tasks.length > 0) {
+        p.startDate = p.tasks.reduce((min, t) => t.startDate < min ? t.startDate : min, p.tasks[0].startDate);
+        p.endDate = p.tasks.reduce((max, t) => t.endDate > max ? t.endDate : max, p.tasks[0].endDate);
+      } else {
+        const today = new Date().toISOString().split("T")[0];
+        p.startDate = p.startDate || today;
+        p.endDate = p.endDate || today;
+      }
       needsSave = true;
     }
   }
@@ -107,9 +123,26 @@ export function saveProjects(projects: Project[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
 }
 
-export function addProject(name: string, color: string, category: string): Project[] {
+export function addProject(
+  name: string,
+  color: string,
+  category: string,
+  startDate: string,
+  endDate: string
+): Project[] {
   const projects = getProjects();
-  projects.push({ id: uuidv4(), name, color, category, tasks: [] });
+  projects.push({ id: uuidv4(), name, color, category, startDate, endDate, tasks: [] });
+  saveProjects(projects);
+  return projects;
+}
+
+export function updateProject(
+  projectId: string,
+  updates: Partial<Omit<Project, "id" | "tasks">>
+): Project[] {
+  const projects = getProjects();
+  const project = projects.find((p) => p.id === projectId);
+  if (project) Object.assign(project, updates);
   saveProjects(projects);
   return projects;
 }
@@ -158,6 +191,12 @@ export function deleteTask(projectId: string, taskId: string): Project[] {
     saveProjects(projects);
   }
   return projects;
+}
+
+export function getProjectProgress(project: Project): number {
+  if (project.tasks.length === 0) return 0;
+  const done = project.tasks.filter((t) => t.completed).length;
+  return Math.round((done / project.tasks.length) * 100);
 }
 
 export function getEarliestDeadline(project: Project): string | null {
