@@ -5,7 +5,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getLinkedInPosts, saveLinkedInPosts } from "@/lib/career-storage";
-import { Copy, Loader2, RefreshCw } from "lucide-react";
+import { Copy, Loader2, RefreshCw, Sparkles } from "lucide-react";
+
+const SUGGESTED_TOPICS = [
+  "EV transition in motorsport",
+  "AI-driven predictive maintenance in F1",
+  "Digital twins in automotive manufacturing",
+  "Why motorsport is the ultimate innovation lab",
+  "The future of fan engagement in racing",
+  "Data strategy for automotive OEMs",
+  "Luxury brands and digital transformation",
+  "What F1 taught me about leadership",
+];
 
 export function LinkedInTab() {
   const [posts, setPosts] = useState<string[]>([]);
@@ -14,6 +25,7 @@ export function LinkedInTab() {
   const [audience, setAudience] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState<number | null>(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     setPosts(getLinkedInPosts());
@@ -21,6 +33,7 @@ export function LinkedInTab() {
 
   const generate = async () => {
     setLoading(true);
+    setError("");
     try {
       const res = await fetch("/api/ai/linkedin", {
         method: "POST",
@@ -32,11 +45,17 @@ export function LinkedInTab() {
         }),
       });
       const data = await res.json();
-      if (data.posts) {
+      if (data.error) {
+        setError(data.error);
+      } else if (data.posts && data.posts.length > 0) {
         setPosts(data.posts);
         saveLinkedInPosts(data.posts);
+      } else {
+        setError("No posts were generated. Try again.");
       }
-    } catch {}
+    } catch {
+      setError("Network error. Check your connection and try again.");
+    }
     setLoading(false);
   };
 
@@ -90,7 +109,30 @@ export function LinkedInTab() {
         </div>
       </div>
 
-      <div className="flex gap-2">
+      {/* Suggested topics */}
+      <div>
+        <div className="flex items-center gap-1.5 mb-2">
+          <Sparkles size={12} className="text-text-muted" />
+          <span className="text-xs text-text-muted">Suggested topics</span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {SUGGESTED_TOPICS.map((t) => (
+            <button
+              key={t}
+              onClick={() => setTopic(t)}
+              className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                topic === t
+                  ? "bg-brg text-white border-brg"
+                  : "bg-cream-light border-border text-text-secondary hover:border-brg hover:text-brg"
+              }`}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3">
         <Button
           onClick={generate}
           disabled={loading}
@@ -110,6 +152,9 @@ export function LinkedInTab() {
             "Generate Posts"
           )}
         </Button>
+        {error && (
+          <span className="text-xs text-racing-red">{error}</span>
+        )}
       </div>
 
       {posts.length > 0 && (
@@ -119,18 +164,21 @@ export function LinkedInTab() {
               key={i}
               className="bg-cream-light border border-border rounded-card p-5"
             >
-              <div className="flex items-start justify-between gap-2 mb-1">
-                <span className="text-xs font-medium text-brg uppercase">
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <span className="text-xs font-medium text-brg uppercase tracking-wide">
                   Post {i + 1}
                 </span>
                 <button
                   onClick={() => copyPost(i)}
-                  className="text-text-muted hover:text-brg transition-colors"
+                  className="text-text-muted hover:text-brg transition-colors flex items-center gap-1"
                 >
                   {copied === i ? (
-                    <span className="text-xs text-brg">Copied!</span>
+                    <span className="text-xs text-brg font-medium">Copied!</span>
                   ) : (
-                    <Copy size={14} />
+                    <>
+                      <Copy size={14} />
+                      <span className="text-xs">Copy</span>
+                    </>
                   )}
                 </button>
               </div>

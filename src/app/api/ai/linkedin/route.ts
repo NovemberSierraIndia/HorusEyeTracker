@@ -1,14 +1,38 @@
 import { NextResponse } from "next/server";
 import { anthropic, MODEL } from "@/lib/anthropic";
 
-const SYSTEM_PROMPT = `You are a LinkedIn content strategist for Nicolas, a Master's student in Digital Innovation Management at LUISS Business School in Rome, graduating July 2026. He is targeting senior leadership roles in performance automotive and motorsport digital transformation. His edge is combining deep automotive/motorsport domain knowledge with digital innovation expertise. Generate 3 distinct LinkedIn post drafts. Each post should: be 150–200 words, open with a strong hook, share a genuine insight or perspective on automotive digital transformation, feel like a real professional voice (not AI-generated), and end with a question to drive engagement. Return only the 3 posts, clearly separated with "---" between them.`;
+const SYSTEM_PROMPT = `You are a LinkedIn content strategist for Nicolas, a Master's student in Digital Innovation Management at LUISS Business School in Rome, graduating July 2026. He is targeting senior leadership roles in performance automotive and motorsport digital transformation. His edge is combining deep automotive/motorsport domain knowledge with digital innovation expertise.
+
+Rules for every post:
+- 150–200 words
+- Open with a strong, scroll-stopping hook (no generic openers)
+- Share a genuine insight or perspective — feel like a real professional voice, NOT AI-generated
+- End with a question or call-to-action to drive engagement
+- Do NOT use hashtags unless they feel natural (max 3)
+- Avoid clichés like "In today's fast-paced world" or "Here's the thing"
+
+Return ONLY the 3 posts, clearly separated with "---" between them. No labels, no numbering, no extra commentary.`;
 
 export async function POST(request: Request) {
   try {
-    const { topic } = await request.json().catch(() => ({}));
-    const userMessage = topic
+    const { topic, tone, audience } = await request.json().catch(() => ({} as Record<string, string>));
+
+    let userMessage = topic
       ? `Generate 3 LinkedIn posts about: ${topic}`
-      : "Generate 3 LinkedIn posts based on my profile.";
+      : "Generate 3 LinkedIn posts based on my profile and current automotive/motorsport trends.";
+
+    if (tone && tone !== "professional") {
+      const toneGuide: Record<string, string> = {
+        "thought-leadership": "Write with authority and forward-thinking vision. Position Nicolas as someone who sees where the industry is heading.",
+        "storytelling": "Use narrative structure — a personal anecdote, lesson learned, or behind-the-scenes moment. Make it relatable and human.",
+        "bold": "Be provocative and contrarian. Challenge conventional thinking in the automotive/motorsport industry. Strong opinions, backed by reasoning.",
+      };
+      userMessage += `\n\nTone: ${toneGuide[tone] || tone}`;
+    }
+
+    if (audience) {
+      userMessage += `\n\nTarget audience: ${audience}. Tailor the language, references, and value proposition to resonate specifically with this group.`;
+    }
 
     const response = await anthropic.messages.create({
       model: MODEL,
@@ -22,6 +46,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ posts });
   } catch (error) {
+    console.error("LinkedIn generation error:", error);
     return NextResponse.json({ error: "Failed to generate posts" }, { status: 500 });
   }
 }
