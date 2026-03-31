@@ -11,6 +11,8 @@ interface CalendarEvent {
 }
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
+const TIMELINE_HEIGHT = 480;
+const HOUR_HEIGHT = TIMELINE_HEIGHT / 24; // 20px per hour
 
 export function TodaysEvents() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -29,19 +31,20 @@ export function TodaysEvents() {
   const allDayEvents = events.filter((e) => !e.start.includes("T"));
   const timedEvents = events.filter((e) => e.start.includes("T"));
 
-  const getEventPosition = (event: CalendarEvent) => {
+  const getEventStyle = (event: CalendarEvent) => {
     const start = new Date(event.start);
     const end = new Date(event.end);
-    const startHour = start.getHours() + start.getMinutes() / 60;
-    const endHour = end.getHours() + end.getMinutes() / 60;
-    const duration = Math.max(endHour - startHour, 0.5);
-    const top = `${(startHour / 24) * 100}%`;
-    const height = `${(duration / 24) * 100}%`;
-    return { top, height };
+    const startMinutes = start.getHours() * 60 + start.getMinutes();
+    const endMinutes = end.getHours() * 60 + end.getMinutes();
+    const duration = Math.max(endMinutes - startMinutes, 30);
+    const top = (startMinutes / (24 * 60)) * TIMELINE_HEIGHT;
+    const height = (duration / (24 * 60)) * TIMELINE_HEIGHT;
+    return { top, height: Math.max(height, 18) };
   };
 
+  // Current time indicator
   const now = new Date();
-  const currentFraction = (now.getHours() + now.getMinutes() / 60) / 24;
+  const currentFraction = (now.getHours() * 60 + now.getMinutes()) / (24 * 60);
 
   return (
     <div className="bg-cream-light border border-border rounded-card p-6">
@@ -62,7 +65,7 @@ export function TodaysEvents() {
               {allDayEvents.map((event) => (
                 <span
                   key={event.id}
-                  className="inline-flex items-center gap-1.5 bg-brg-light text-brg text-xs font-medium px-3 py-1.5 rounded-lg"
+                  className="inline-flex items-center gap-1.5 bg-brg-light text-brg text-xs font-medium px-3 py-1.5 rounded-lg border border-brg/20"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-brg" />
                   {event.title}
@@ -72,14 +75,17 @@ export function TodaysEvents() {
             </div>
           )}
 
-          {/* Compact 24-hour timeline — no scroll */}
-          <div className="relative rounded-lg border border-border bg-cream/30" style={{ height: 480 }}>
-            {/* Hour rows */}
+          {/* 24-hour timeline */}
+          <div
+            className="relative rounded-lg border border-border bg-cream/30"
+            style={{ height: TIMELINE_HEIGHT }}
+          >
+            {/* Hour grid lines + labels */}
             {HOURS.map((h) => (
               <div
                 key={h}
                 className="absolute left-0 right-0 border-t border-border/30"
-                style={{ top: `${(h / 24) * 100}%` }}
+                style={{ top: h * HOUR_HEIGHT }}
               >
                 <span className="absolute left-1.5 -top-[7px] font-mono text-[9px] text-text-muted leading-none">
                   {formatHour(h)}
@@ -89,27 +95,33 @@ export function TodaysEvents() {
 
             {/* Event blocks */}
             {timedEvents.map((event) => {
-              const pos = getEventPosition(event);
+              const pos = getEventStyle(event);
               const startTime = new Date(event.start).toLocaleTimeString("en-GB", {
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+              const endTime = new Date(event.end).toLocaleTimeString("en-GB", {
                 hour: "2-digit",
                 minute: "2-digit",
               });
               return (
                 <div
                   key={event.id}
-                  className="absolute left-10 right-2 bg-brg/10 rounded-r-md overflow-hidden"
+                  className="absolute left-10 right-2 rounded-md border border-brg bg-brg/10 overflow-hidden"
                   style={{
-                    top: pos.top,
-                    height: pos.height,
-                    borderLeft: "3px solid var(--brg, #1B4332)",
-                    minHeight: 16,
+                    top: pos.top + 1,
+                    height: pos.height - 2,
                   }}
                 >
-                  <div className="px-2 py-0.5">
-                    <p className="text-[11px] font-medium text-text-primary truncate">
+                  <div className="px-2.5 py-1 h-full flex flex-col justify-center">
+                    <p className="text-[11px] font-semibold text-brg truncate">
                       {event.title}
                     </p>
-                    <p className="font-mono text-[9px] text-text-muted">{startTime}</p>
+                    {pos.height > 22 && (
+                      <p className="font-mono text-[9px] text-brg/70">
+                        {startTime} – {endTime}
+                      </p>
+                    )}
                   </div>
                 </div>
               );
