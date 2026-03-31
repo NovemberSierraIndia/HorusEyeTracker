@@ -12,6 +12,14 @@ interface CalendarEvent {
 
 const DAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
+// Format a local Date as "YYYY-MM-DD" without UTC conversion
+function toLocalDateStr(d: Date): string {
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
 export function MonthlyView() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -39,7 +47,7 @@ export function MonthlyView() {
 
   const goToToday = () => {
     setCurrentMonth(new Date());
-    setSelectedDate(new Date().toISOString().split("T")[0]);
+    setSelectedDate(toLocalDateStr(new Date()));
   };
 
   // Build month grid
@@ -51,10 +59,9 @@ export function MonthlyView() {
   const days: (Date | null)[] = [];
   for (let i = 0; i < startPad; i++) days.push(null);
   for (let d = 1; d <= totalDays; d++) days.push(new Date(year, month, d));
-  // Pad end to complete the week
   while (days.length % 7 !== 0) days.push(null);
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = toLocalDateStr(new Date());
 
   const getEventsForDay = (dateStr: string) => {
     return events.filter((e) => {
@@ -75,7 +82,11 @@ export function MonthlyView() {
   // Selected day events
   const selectedDayEvents = selectedDate ? getEventsForDay(selectedDate) : [];
   const selectedDayLabel = selectedDate
-    ? new Date(selectedDate + "T12:00:00").toLocaleDateString("en-GB", {
+    ? new Date(
+        parseInt(selectedDate.split("-")[0]),
+        parseInt(selectedDate.split("-")[1]) - 1,
+        parseInt(selectedDate.split("-")[2])
+      ).toLocaleDateString("en-GB", {
         weekday: "long",
         day: "numeric",
         month: "long",
@@ -144,7 +155,7 @@ export function MonthlyView() {
                   <div key={`empty-${i}`} className="bg-cream/20 min-h-[80px]" />
                 );
               }
-              const dateStr = day.toISOString().split("T")[0];
+              const dateStr = toLocalDateStr(day);
               const isToday = dateStr === today;
               const isSelected = dateStr === selectedDate;
               const dayEvents = getEventsForDay(dateStr);
