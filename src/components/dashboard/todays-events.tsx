@@ -10,9 +10,24 @@ interface CalendarEvent {
   end: string;
 }
 
-const HOURS = Array.from({ length: 24 }, (_, i) => i);
-const TIMELINE_HEIGHT = 480;
-const HOUR_HEIGHT = TIMELINE_HEIGHT / 24; // 20px per hour
+const START_HOUR = 5;
+const END_HOUR = 24;
+const VISIBLE_HOURS = END_HOUR - START_HOUR; // 19 hours
+const TIMELINE_HEIGHT = 520;
+const HOUR_HEIGHT = TIMELINE_HEIGHT / VISIBLE_HOURS;
+
+function getWorkloadLevel(eventCount: number): {
+  label: string;
+  color: string;
+  bg: string;
+  width: number;
+} {
+  if (eventCount === 0) return { label: "Free day", color: "text-brg", bg: "bg-brg", width: 0 };
+  if (eventCount <= 2) return { label: "Light", color: "text-brg", bg: "bg-brg", width: 25 };
+  if (eventCount <= 4) return { label: "Moderate", color: "text-[#B7950B]", bg: "bg-[#B7950B]", width: 50 };
+  if (eventCount <= 6) return { label: "Busy", color: "text-[#D35400]", bg: "bg-[#D35400]", width: 75 };
+  return { label: "Packed", color: "text-racing-red", bg: "bg-racing-red", width: 100 };
+}
 
 export function TodaysEvents() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -30,6 +45,8 @@ export function TodaysEvents() {
 
   const allDayEvents = events.filter((e) => !e.start.includes("T"));
   const timedEvents = events.filter((e) => e.start.includes("T"));
+  const totalEvents = events.length;
+  const workload = getWorkloadLevel(totalEvents);
 
   const getEventStyle = (event: CalendarEvent) => {
     const start = new Date(event.start);
@@ -37,19 +54,50 @@ export function TodaysEvents() {
     const startMinutes = start.getHours() * 60 + start.getMinutes();
     const endMinutes = end.getHours() * 60 + end.getMinutes();
     const duration = Math.max(endMinutes - startMinutes, 30);
-    const top = (startMinutes / (24 * 60)) * TIMELINE_HEIGHT;
-    const height = (duration / (24 * 60)) * TIMELINE_HEIGHT;
-    return { top, height: Math.max(height, 18) };
+
+    const offsetMinutes = START_HOUR * 60;
+    const totalMinutes = VISIBLE_HOURS * 60;
+
+    const top = ((startMinutes - offsetMinutes) / totalMinutes) * TIMELINE_HEIGHT;
+    const height = (duration / totalMinutes) * TIMELINE_HEIGHT;
+    return { top: Math.max(top, 0), height: Math.max(height, 22) };
   };
 
   // Current time indicator
   const now = new Date();
-  const currentFraction = (now.getHours() * 60 + now.getMinutes()) / (24 * 60);
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const offsetMinutes = START_HOUR * 60;
+  const currentTop = ((currentMinutes - offsetMinutes) / (VISIBLE_HOURS * 60)) * TIMELINE_HEIGHT;
+  const showCurrentLine = currentMinutes >= offsetMinutes && currentMinutes <= END_HOUR * 60;
+
+  const visibleHours = Array.from({ length: VISIBLE_HOURS }, (_, i) => START_HOUR + i);
 
   return (
     <div className="bg-cream-light border border-border rounded-card p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-medium text-text-primary">Today&apos;s Schedule</h2>
+
+        {/* Workload Meter */}
+        {!loading && (
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] text-text-muted uppercase tracking-wide">Workload</span>
+              <div className="w-24 h-2 bg-cream rounded-full overflow-hidden border border-border/50">
+                <div
+                  className={`h-full rounded-full transition-all ${workload.bg}`}
+                  style={{ width: `${workload.width}%` }}
+                />
+              </div>
+              <span className={`text-xs font-medium ${workload.color}`}>
+                {workload.label}
+              </span>
+            </div>
+            <span className="text-[10px] text-text-muted font-mono">
+              {totalEvents} event{totalEvents !== 1 ? "s" : ""}
+            </span>
+          </div>
+        )}
+
         <Link href="/calendar" className="text-sm text-brg hover:text-brg-hover">
           View all →
         </Link>
@@ -75,17 +123,17 @@ export function TodaysEvents() {
             </div>
           )}
 
-          {/* 24-hour timeline */}
+          {/* Timeline: 05:00 – 00:00 */}
           <div
             className="relative rounded-lg border border-border bg-cream/30"
             style={{ height: TIMELINE_HEIGHT }}
           >
             {/* Hour grid lines + labels */}
-            {HOURS.map((h) => (
+            {visibleHours.map((h, i) => (
               <div
                 key={h}
                 className="absolute left-0 right-0 border-t border-border/30"
-                style={{ top: h * HOUR_HEIGHT }}
+                style={{ top: i * HOUR_HEIGHT }}
               >
                 <span className="absolute left-1.5 -top-[7px] font-mono text-[9px] text-text-muted leading-none">
                   {formatHour(h)}
@@ -117,7 +165,7 @@ export function TodaysEvents() {
                     <p className="text-[11px] font-semibold text-brg truncate">
                       {event.title}
                     </p>
-                    {pos.height > 22 && (
+                    {pos.height > 26 && (
                       <p className="font-mono text-[9px] text-brg/70">
                         {startTime} – {endTime}
                       </p>
@@ -128,13 +176,15 @@ export function TodaysEvents() {
             })}
 
             {/* Current time red line */}
-            <div
-              className="absolute left-0 right-0 z-10 flex items-center pointer-events-none"
-              style={{ top: `${currentFraction * 100}%` }}
-            >
-              <div className="w-2 h-2 rounded-full bg-racing-red -ml-0.5" />
-              <div className="flex-1 h-px bg-racing-red" />
-            </div>
+            {showCurrentLine && (
+              <div
+                className="absolute left-0 right-0 z-10 flex items-center pointer-events-none"
+                style={{ top: currentTop }}
+              >
+                <div className="w-2 h-2 rounded-full bg-racing-red -ml-0.5" />
+                <div className="flex-1 h-px bg-racing-red" />
+              </div>
+            )}
           </div>
         </>
       )}
