@@ -12,9 +12,9 @@ export interface ImportanceOption {
 export const IMPORTANCE_OPTIONS: ImportanceOption[] = [
   { level: "none", label: "Not Important", points: 0, color: "#94A3B8" },
   { level: "transport", label: "Transportation", points: 5, color: "#566573" },
-  { level: "moderate", label: "Moderately Important", points: 10, color: "#B7950B" },
-  { level: "important", label: "Important", points: 20, color: "#D35400" },
-  { level: "extreme", label: "Extremely Important", points: 30, color: "#C0392B" },
+  { level: "moderate", label: "Moderately Important", points: 15, color: "#B7950B" },
+  { level: "important", label: "Important", points: 25, color: "#D35400" },
+  { level: "extreme", label: "Extremely Important", points: 40, color: "#C0392B" },
 ];
 
 // Store categories keyed by event name (normalized lowercase)
