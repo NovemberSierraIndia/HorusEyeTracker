@@ -1,4 +1,6 @@
 const LINKEDIN_KEY = "horuseye-linkedin-posts";
+const PAST_POSTS_KEY = "horuseye-past-linkedin-posts";
+const SMART_TOPICS_KEY = "horuseye-smart-topics";
 const CERTS_KEY = "horuseye-certificates";
 
 export function getLinkedInPosts(): string[] {
@@ -9,6 +11,42 @@ export function getLinkedInPosts(): string[] {
 
 export function saveLinkedInPosts(posts: string[]) {
   localStorage.setItem(LINKEDIN_KEY, JSON.stringify(posts));
+}
+
+// Past LinkedIn posts (user-saved for topic analysis)
+export function getPastPosts(): string[] {
+  if (typeof window === "undefined") return [];
+  const stored = localStorage.getItem(PAST_POSTS_KEY);
+  return stored ? JSON.parse(stored) : [];
+}
+
+export function savePastPosts(posts: string[]) {
+  localStorage.setItem(PAST_POSTS_KEY, JSON.stringify(posts));
+}
+
+export function addPastPost(post: string): string[] {
+  const posts = getPastPosts();
+  posts.unshift(post.trim());
+  savePastPosts(posts);
+  return posts;
+}
+
+export function removePastPost(index: number): string[] {
+  const posts = getPastPosts();
+  posts.splice(index, 1);
+  savePastPosts(posts);
+  return posts;
+}
+
+// Smart topic suggestions (AI-generated from past posts)
+export function getSmartTopics(): string[] {
+  if (typeof window === "undefined") return [];
+  const stored = localStorage.getItem(SMART_TOPICS_KEY);
+  return stored ? JSON.parse(stored) : [];
+}
+
+export function saveSmartTopics(topics: string[]) {
+  localStorage.setItem(SMART_TOPICS_KEY, JSON.stringify(topics));
 }
 
 export interface Certificate {
