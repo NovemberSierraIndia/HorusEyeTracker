@@ -1,4 +1,4 @@
-import { WeeklyView } from "@/components/calendar/weekly-view";
+import { MonthlyView } from "@/components/calendar/monthly-view";
 import { InboxList } from "@/components/inbox/inbox-list";
 
 export default function CalendarPage() {
@@ -8,7 +8,7 @@ export default function CalendarPage() {
         Calendar & Inbox
       </h1>
       <div className="space-y-6">
-        <WeeklyView />
+        <MonthlyView />
         <InboxList />
       </div>
     </div>
