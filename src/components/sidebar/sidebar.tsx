@@ -10,7 +10,7 @@ import {
   CalendarDays,
   FolderKanban,
   Rocket,
-  ClipboardCheck,
+  BookHeart,
   Menu,
   X,
 } from "lucide-react";
@@ -41,7 +41,7 @@ export function Sidebar() {
     { href: "/calendar", icon: <CalendarDays size={20} />, label: "Calendar & Inbox", badge: unreadCount },
     { href: "/projects", icon: <FolderKanban size={20} />, label: "Projects" },
     { href: "/career", icon: <Rocket size={20} />, label: "Career Engine" },
-    { href: "/review", icon: <ClipboardCheck size={20} />, label: "Weekly Review" },
+    { href: "/review", icon: <BookHeart size={20} />, label: "Journal" },
   ];
 
   const sidebarContent = (
