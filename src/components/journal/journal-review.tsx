@@ -63,10 +63,14 @@ function MoodChart({
   // Show date labels - pick ~6 evenly spaced labels
   const labelCount = Math.min(filtered.length, range === "week" ? 7 : 6);
   const labelIndices: number[] = [];
-  for (let i = 0; i < labelCount; i++) {
-    labelIndices.push(
-      Math.round((i / (labelCount - 1)) * (filtered.length - 1))
-    );
+  if (labelCount === 1) {
+    labelIndices.push(0);
+  } else {
+    for (let i = 0; i < labelCount; i++) {
+      labelIndices.push(
+        Math.round((i / (labelCount - 1)) * (filtered.length - 1))
+      );
+    }
   }
 
   return (
@@ -172,7 +176,7 @@ function MoodChart({
 
 function WallOfWins({ entries }: { entries: JournalEntry[] }) {
   const allWins = entries
-    .filter((e) => e.wins.trim())
+    .filter((e) => e.wins && e.wins.trim())
     .flatMap((e) =>
       e.wins
         .split("\n")
@@ -283,7 +287,7 @@ export function JournalReview() {
           </div>
           <div className="bg-cream-light border border-border rounded-card px-4 py-3 flex-1 text-center">
             <p className="text-2xl font-semibold text-racing-red">
-              {entries.filter((e) => e.wins.trim()).reduce((c, e) => c + e.wins.split("\n").filter((w) => w.trim()).length, 0)}
+              {entries.filter((e) => e.wins && e.wins.trim()).reduce((c, e) => c + e.wins.split("\n").filter((w) => w.trim()).length, 0)}
             </p>
             <p className="text-xs text-text-muted">Total Wins</p>
           </div>
