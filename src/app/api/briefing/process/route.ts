@@ -7,7 +7,7 @@ When given raw notes, respond ONLY with a valid JSON object — no markdown, no 
 
 {
   "title": "A short 3-6 word title for this briefing (e.g. 'Fintech Lab: Blockchain Fundamentals')",
-  "summary": "Each bullet point on its own line, prefixed with '- '. Write 3-8 concise bullet points. Each should be one clear sentence. Capture key insights, decisions, open questions, and action items.",
+  "summary": "A single string with bullet points separated by \\n. Each line starts with '- '. Example: '- First point\\n- Second point\\n- Third point'. Write 3-8 concise bullet points. Each should be one clear sentence. Capture key insights, decisions, open questions, and action items.",
   "events": [
     {
       "title": "Event title",
@@ -57,6 +57,11 @@ export async function POST(request: Request) {
       .replace(/```/g, "")
       .trim();
     const parsed = JSON.parse(cleaned);
+
+    // Normalize summary: if AI returned an array, join into newline-separated string
+    if (Array.isArray(parsed.summary)) {
+      parsed.summary = parsed.summary.join("\n");
+    }
 
     return NextResponse.json(parsed);
   } catch (error) {
