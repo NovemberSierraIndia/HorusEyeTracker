@@ -155,7 +155,7 @@ function SummarySection({
   onSave: () => void;
 }) {
   const [open, setOpen] = useState(true);
-  const bullets = (summary || "")
+  const bullets = String(summary || "")
     .split("\n")
     .map((l) => l.trim())
     .filter(Boolean);

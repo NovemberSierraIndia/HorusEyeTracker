@@ -24,7 +24,8 @@ function formatDate(dateStr: string): string {
 
 function getFirstLine(summary: string | null): string {
   if (!summary) return "No summary";
-  const firstBullet = summary.split("\n").find((l) => l.trim()) || summary;
+  const s = String(summary);
+  const firstBullet = s.split("\n").find((l) => l.trim()) || s;
   return firstBullet.replace(/^[-•*]\s*/, "").slice(0, 80);
 }
 
