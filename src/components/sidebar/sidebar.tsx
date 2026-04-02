@@ -11,6 +11,7 @@ import {
   FolderKanban,
   Rocket,
   BookHeart,
+  FileText,
   Menu,
   X,
 } from "lucide-react";
@@ -41,6 +42,7 @@ export function Sidebar() {
     { href: "/calendar", icon: <CalendarDays size={20} />, label: "Calendar & Inbox", badge: unreadCount },
     { href: "/projects", icon: <FolderKanban size={20} />, label: "Projects" },
     { href: "/career", icon: <Rocket size={20} />, label: "Career Engine" },
+    { href: "/briefing-room", icon: <FileText size={20} />, label: "Briefing Room" },
     { href: "/review", icon: <BookHeart size={20} />, label: "Journal" },
   ];
 
