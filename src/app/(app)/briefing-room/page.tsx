@@ -7,6 +7,7 @@ import { BriefingHistory } from "@/components/briefing/briefing-history";
 import type { BriefingEntry, DetectedEvent, DetectedDraft } from "@/lib/briefing-types";
 
 interface ProcessedResult {
+  title: string;
   summary: string;
   events: DetectedEvent[];
   drafts: DetectedDraft[];
@@ -68,6 +69,7 @@ export default function BriefingRoomPage() {
         setError(data.error);
       } else {
         const processed: ProcessedResult = {
+          title: data.title || "",
           summary: data.summary || "",
           events: data.events || [],
           drafts: data.drafts || [],
@@ -92,6 +94,7 @@ export default function BriefingRoomPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           raw_notes: notes,
+          title: result.title,
           summary: result.summary,
           tags: result.tags,
           events_detected: result.events,

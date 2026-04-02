@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 
 interface ProcessedResult {
+  title: string;
   summary: string;
   events: DetectedEvent[];
   drafts: DetectedDraft[];

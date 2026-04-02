@@ -2,6 +2,7 @@ export interface BriefingEntry {
   id: string;
   created_at: string;
   raw_notes: string;
+  title: string | null;
   summary: string | null;
   tags: string[];
   events_detected: DetectedEvent[];

@@ -6,7 +6,8 @@ const SYSTEM_PROMPT = `You are the executive assistant of Nicolas Salois-Ishak. 
 When given raw notes, respond ONLY with a valid JSON object — no markdown, no explanation, no preamble. The JSON must have exactly this structure:
 
 {
-  "summary": "A clean, structured summary in 3-8 bullet points. Capture key insights, decisions, open questions, and anything actionable.",
+  "title": "A short 3-6 word title for this briefing (e.g. 'Fintech Lab: Blockchain Fundamentals')",
+  "summary": "Each bullet point on its own line, prefixed with '- '. Write 3-8 concise bullet points. Each should be one clear sentence. Capture key insights, decisions, open questions, and action items.",
   "events": [
     {
       "title": "Event title",

@@ -22,11 +22,12 @@ function formatDate(dateStr: string): string {
   });
 }
 
-function getFirstLine(summary: string | null): string {
-  if (!summary) return "No summary";
-  const s = String(summary);
+function getTitle(entry: BriefingEntry): string {
+  if (entry.title) return String(entry.title);
+  if (!entry.summary) return "No summary";
+  const s = String(entry.summary);
   const firstBullet = s.split("\n").find((l) => l.trim()) || s;
-  return firstBullet.replace(/^[-•*]\s*/, "").slice(0, 80);
+  return firstBullet.replace(/^[-•*]\s*/, "").slice(0, 60);
 }
 
 export function BriefingHistory({
@@ -87,8 +88,8 @@ export function BriefingHistory({
                   {formatDate(entry.created_at)}
                 </span>
               </div>
-              <p className="text-xs text-text-primary line-clamp-1">
-                {getFirstLine(entry.summary)}
+              <p className="text-xs text-text-primary line-clamp-1 font-medium">
+                {getTitle(entry)}
               </p>
               {entry.tags && entry.tags.length > 0 && (
                 <div className="flex gap-1 mt-1.5">
