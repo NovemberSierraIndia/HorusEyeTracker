@@ -1,6 +1,6 @@
 "use client";
 
-import { BriefingEntry } from "@/lib/supabase";
+import { BriefingEntry } from "@/lib/briefing-types";
 import { Input } from "@/components/ui/input";
 import { Search, FileText } from "lucide-react";
 

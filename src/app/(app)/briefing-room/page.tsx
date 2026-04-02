@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { BriefingInput } from "@/components/briefing/briefing-input";
 import { BriefingOutput } from "@/components/briefing/briefing-output";
 import { BriefingHistory } from "@/components/briefing/briefing-history";
-import { BriefingEntry, DetectedEvent, DetectedDraft } from "@/lib/supabase";
+import { BriefingEntry, DetectedEvent, DetectedDraft } from "@/lib/briefing-types";
 
 interface ProcessedResult {
   summary: string;

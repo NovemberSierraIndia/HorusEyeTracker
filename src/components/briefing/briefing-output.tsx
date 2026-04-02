@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { BriefingEntry, DetectedEvent, DetectedDraft } from "@/lib/supabase";
+import { BriefingEntry, DetectedEvent, DetectedDraft } from "@/lib/briefing-types";
 import { EyeIcon } from "@/components/icons/eye-icon";
 import {
   ChevronDown,
