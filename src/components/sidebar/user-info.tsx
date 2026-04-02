@@ -1,6 +1,7 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
+import { LogOut } from "lucide-react";
 
 export function UserInfo({ collapsed }: { collapsed?: boolean }) {
   const { data: session } = useSession();
@@ -17,12 +18,21 @@ export function UserInfo({ collapsed }: { collapsed?: boolean }) {
         />
       )}
       {!collapsed && (
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-text-primary truncate">
             {session.user.name}
           </p>
           <p className="text-xs text-text-muted truncate">{session.user.email}</p>
         </div>
+      )}
+      {!collapsed && (
+        <button
+          onClick={() => signOut({ callbackUrl: "/" })}
+          className="p-1.5 rounded-lg text-text-muted hover:text-racing-red hover:bg-racing-red/10 transition-colors shrink-0"
+          title="Sign out"
+        >
+          <LogOut size={16} />
+        </button>
       )}
     </div>
   );
