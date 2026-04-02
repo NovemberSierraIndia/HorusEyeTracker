@@ -10,7 +10,7 @@ export async function GET() {
   }
 
   try {
-    // First try with CATEGORY_PRIMARY, fall back to INBOX only
+    // First try with CATEGORY_PRIMARY, fall back to INBOX with query filter
     let listData;
     try {
       listData = await googleFetch(
@@ -18,9 +18,9 @@ export async function GET() {
         session.accessToken
       );
     } catch {
-      // CATEGORY_PRIMARY might not exist — fall back to INBOX only
+      // CATEGORY_PRIMARY might not exist — fall back to INBOX excluding promotions/social/updates/forums
       listData = await googleFetch(
-        "https://www.googleapis.com/gmail/v1/users/me/messages?maxResults=15&labelIds=INBOX",
+        `https://www.googleapis.com/gmail/v1/users/me/messages?maxResults=15&labelIds=INBOX&q=${encodeURIComponent("-category:promotions -category:social -category:updates -category:forums")}`,
         session.accessToken
       );
     }
