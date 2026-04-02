@@ -24,6 +24,7 @@ interface EmailDetail {
 export function InboxList() {
   const [emails, setEmails] = useState<Email[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [selectedEmail, setSelectedEmail] = useState<EmailDetail | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
   const [loadingEmail, setLoadingEmail] = useState(false);
@@ -31,8 +32,14 @@ export function InboxList() {
   useEffect(() => {
     fetch("/api/gmail/inbox")
       .then((r) => r.json())
-      .then((d) => setEmails(d.messages || []))
-      .catch(() => {})
+      .then((d) => {
+        if (d.error) {
+          setError(d.error);
+        } else {
+          setEmails(d.messages || []);
+        }
+      })
+      .catch((e) => setError("Could not connect to Gmail. " + e.message))
       .finally(() => setLoading(false));
   }, []);
 
@@ -73,6 +80,8 @@ export function InboxList() {
             <div key={i} className="h-14 bg-cream rounded-lg animate-pulse" />
           ))}
         </div>
+      ) : error ? (
+        <p className="text-racing-red text-sm">{error}</p>
       ) : emails.length === 0 ? (
         <p className="text-text-muted text-sm">No emails found.</p>
       ) : (
